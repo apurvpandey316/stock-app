@@ -47,7 +47,7 @@ UserSchema.statics.login = async function (req, res) {
             handleBadRequest(res, 'Incorrect username or password');
             return;
         }
-        const token = createToken(user._id.toString());
+        const token = createToken({ _id: user._id, email: user.email });
         res.status(200).json({ token, user });
     } catch (e) {
         handleInternalServer(res);
@@ -72,7 +72,7 @@ UserSchema.statics.signup = async function (req, res, next) {
             password: req.body.password,
         });
         user = await user.save();
-        const token = createToken(user._id.toString());
+        const token = createToken({ _id: user._id, email: user.email });
         req.token = token;
         req.user = user;
         next();
@@ -92,12 +92,12 @@ UserSchema.statics.verifySession = async function (req, res, next) {
             handleUnauthorized(res);
             return;
         }
-        const userId = verifyToken(token);
-        if (!userId) {
+        const { email, _id } = verifyToken(token);
+        if (!_id) {
             handleUnauthorized(res);
             return;
         }
-        const user = await User.findById(userId);
+        const user = await User.findById(_id);
         if (!user) {
             handleNotFound(res, 'User not found!');
             return;
