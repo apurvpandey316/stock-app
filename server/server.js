@@ -1,8 +1,6 @@
 require('dotenv').config();
 require('./config/dbConfig').config();
-const mongoose = require('mongoose');
 const express = require('express');
-const homeRoutes = require('./routes/home');
 const path = require('path');
 
 // Setup
@@ -14,7 +12,10 @@ app.use(express.json());
 app.use('/public', express.static(path.resolve(__dirname, 'public')));
 
 // Routes
-app.use('/', homeRoutes);
+app.use('/auth', require('./routes/auth'));
+app.use('/portfolio', require('./routes/portfolio'));
+app.use('/profile', require('./routes/profile'));
+app.use('/actions', require('./routes/actions'));
 
 // Listen
 app.listen(PORT, () => {
